@@ -6,8 +6,8 @@
 
 #### Image:
 
-https://thumbs2.imgbox.com/c1/ab/38AUdtbU_t.jpg
+<img src="https://thumbs2.imgbox.com/c1/ab/38AUdtbU_t.jpg">
 
 #### Avatar:
+<img src="https://thumbs2.imgbox.com/69/f9/slR3Rrqv_t.png">
 
-https://thumbs2.imgbox.com/69/f9/slR3Rrqv_t.png
