@@ -8,7 +8,7 @@ class Fraction {
 private:
     int numerator;
     int denominator;
-    //Chat GPI helped with some code
+  
     // Helper function to simplify the fraction
     void simplify() {
         if (denominator == 0) {
@@ -104,3 +104,4 @@ int main() {
 
     return 0;
 }
+//Chat GPT helped with missing code I had trouble solving. 
