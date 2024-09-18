@@ -13,17 +13,12 @@ This Program creates a proper fraction class that will overload the +, -, *, /, 
 
 ### Instructions
 
-- The code is in 
-- My program expects two parameters to be placed on the command line when you run the program.
+- The code is in the folder Program 1, in the file Fraction.cpp
+- My program has fractions hard coded in, remove and add numbers if you like.
 - Parameters `<input file> <number of players>`
-- The input file should be formatted with a players name and age on a seperate line:
-
-+------------+
-| name1 age1 |
-| name2 age2 |
-| etc...     |
-+------------+
+- The input file should be formatted with fractions only.
 
 - Example Command:
-    - `python <code> <input file> <num players>`
-    - `python main.cpp input.txt 3`
+    - in the main.cpp file
+    - (1,2)
+    - (3,4)
