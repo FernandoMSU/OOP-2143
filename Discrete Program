@@ -1,3 +1,16 @@
+//--------------------------------------------------------------
+//
+// Fernando Gonzalez
+//
+// Course: CMPS-2433-101, Fall 24, Stringfellow
+//
+// Purpose: General description of what the program is to find //the highest bit that is set in a number, k. Then print out 
+//the index of the highest binary digit set in the binary //representation of the number k. Then SET the next 
+//highestbit to 1 and then print the new number, k2.Using //bitwise operators.
+//
+//--------------------------------------------------------------
+
+
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -5,11 +18,11 @@
 using namespace std;
 
 // Function declarations
-int highestBitSet(int k);
-int setNextHighestBit(int k, int highestBit);
+int findHighestBit(int k);
+int setNextBit(int k, int highestBit);
 
 // Function to find the highest bit set
-int highestBitSet(int k) {
+int findHighestBit(int k) {
     if (k == 0) {
         return -1; // Special case for 0
     }
@@ -24,7 +37,7 @@ int highestBitSet(int k) {
 }
 
 // Function to set the next highest bit
-int setNextHighestBit(int k, int highestBit) {
+int setNextBit(int k, int highestBit) {
     if (highestBit == -1) {
         return 1;  // Special case for 0: set the first bit
     }
@@ -35,11 +48,8 @@ int setNextHighestBit(int k, int highestBit) {
 
 int main() {
     ifstream infile("HighBits.dat");
-    if (!infile) {
-        cerr << "Error: Could not open file HighBits.dat" << endl;
-        return 1;
-    }
 
+    // Ensure the file opened successfull
     int N;
     infile >> N;  // Read the number of test cases
 
@@ -54,10 +64,10 @@ int main() {
         infile >> k;  // Read each test case
 
         // Get the highest bit set
-        int highestBit = highestBitSet(k);
+        int highestBit = findHighestBit(k);
 
         // Get k2, the number with the next highest bit set
-        int k2 = setNextHighestBit(k, highestBit);
+        int k2 = setNextBit(k, highestBit);
 
         // Output the results
         if (k == 0) {
@@ -69,4 +79,4 @@ int main() {
 
     infile.close();
     return 0;
-} 
+}
