@@ -1,0 +1,45 @@
+Provide your bulleted lists for each class.
+Label the keywords with necessary, possible, or wishful.
+Explain where you are using inheritance and composition in your class design.
+Class Stats{
+int timeplayed;
+int wins;
+int losses;
+int streak;
+int loneststreak;
+;}
+
+Class Player{
+string firstname;
+string lastname;
+string username;
+string password;
+Stats playerStats;
+};
+
+Class Game{
+players
+scores
+Start
+End
+currency
+}
+
+Class KnuckleBones{
+players
+score 
+done 
+go 
+leaderboard
+}
+
+Class Yahtzee{
+players 
+score 
+done
+go
+leadderboard
+}
+
+Class VideoPoker{
+}
