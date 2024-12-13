@@ -6,4 +6,4 @@
 |  P01  |  [P01 Link](https://github.com/FernandoMSU/OOP-2143/blob/main/Assignment/PO1/Fraction.cpp)  |  A fraction class that will overload the operators  |
 |  P02A  |  [P02A Link](https://github.com/FernandoMSU/OOP-2143/blob/main/Assignment/PO2A/CursesTest.md)  |  Testing out ncurses and proving that it works when ran  |
 |  P02B  |  [P02B Link](https://github.com/FernandoMSU/OOP-2143/blob/main/Assignment/PO2B/Knuckle%20Bones)  |  List out details that could be used for a knucklebones game and is a rough outline for P02  |
-|  P03  |  [P03 Link](P03)  |  This code counts the amount of times a circle is clicked and has a nice background  |
+|  P03  |  [P03 Link](https://github.com/FernandoMSU/OOP-2143/blob/main/Assignment/PO3/my.cpp)  |  This code counts the amount of times a circle is clicked and has a nice background  |
