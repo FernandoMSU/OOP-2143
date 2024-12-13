@@ -1,170 +1,152 @@
-#pragma once
 #include <SFML/Graphics.hpp>
-#include <algorithm>
-#include <filesystem>
+#include <SFML/System.hpp>
 #include <iostream>
-#include <memory>
-#include <regex>
-#include <stdexcept>
-#include <string>
-#include <vector>
 
-namespace fs = std::filesystem;
+enum class State { MainMenu, Gameplay, Paused, EndScreen };
 
-// Glob function for retrieving files matching a regex
-std::vector<std::string> glob(const std::string& folderPath, const std::string& pattern) {
-    std::vector<std::string> matchedFiles;
+int main() {
+    sf::RenderWindow gameWindow(sf::VideoMode(800, 600), "Game States Example with Pause and Transitions");
 
-    try {
-        if (!fs::exists(folderPath) || !fs::is_directory(folderPath)) {
-            throw std::runtime_error("Invalid folder path");
-        }
+    // Background setup
+    sf::Texture bgTexture;
+    sf::Sprite bgSprite;
+    sf::Vector2u bgSize, screenSize;
 
-        std::regex regexPattern(pattern);
+    if (!bgTexture.loadFromFile("background_image.jpg")) {
+        std::cerr << "Error: Failed to load background image\n";
+        return -1;
+    } else {
+        // Scale background to fit the window
+        bgSize = bgTexture.getSize();
+        screenSize = gameWindow.getSize();
+        float scaleX = static_cast<float>(screenSize.x) / bgSize.x;
+        float scaleY = static_cast<float>(screenSize.y) / bgSize.y;
+        bgSprite.setTexture(bgTexture);
+        bgSprite.setScale(scaleX, scaleY);
+    }
 
-        for (const auto& entry : fs::directory_iterator(folderPath)) {
-            if (entry.is_regular_file()) {
-                std::string fileName = entry.path().filename().string();
-                if (std::regex_match(fileName, regexPattern)) {
-                    matchedFiles.push_back(entry.path().string());
+    // Current game state
+    State gameState = State::MainMenu;
+
+    // Font and text setup
+    sf::Font textFont;
+    if (!textFont.loadFromFile("Arial.ttf")) {
+        std::cerr << "Error: Failed to load font\n";
+        return -1;
+    }
+
+    sf::Text menuText("Press Enter to Start", textFont, 50);
+    menuText.setFillColor(sf::Color::White);
+    menuText.setPosition(200.f, 250.f);
+
+    sf::Text gameOverText("Game Over! Press R to Restart", textFont, 50);
+    gameOverText.setFillColor(sf::Color::Red);
+    gameOverText.setPosition(150.f, 250.f);
+
+    sf::Text pauseText("Game Paused! Press R to Resume", textFont, 50);
+    pauseText.setFillColor(sf::Color::Blue);
+    pauseText.setPosition(150.f, 250.f);
+
+    // Click counter setup
+    int clickCount = 0;
+    sf::Text clickCounter;
+    clickCounter.setFont(textFont);
+    clickCounter.setCharacterSize(30);
+    clickCounter.setFillColor(sf::Color::White);
+    clickCounter.setPosition(10.f, 10.f);
+    clickCounter.setString("Clicks: 0");
+
+    // Player setup
+    sf::CircleShape playerAvatar(50.f);
+    playerAvatar.setFillColor(sf::Color::Green);
+    playerAvatar.setPosition(300.f, 300.f);
+
+    float moveSpeed = 5.0f;
+
+    // Clock for fade-in effect
+    sf::Clock transitionTimer;
+    sf::RectangleShape transitionOverlay(sf::Vector2f(800.f, 600.f));
+    transitionOverlay.setFillColor(sf::Color(0, 0, 0, 0));
+
+    // Main game loop
+    while (gameWindow.isOpen()) {
+        sf::Event inputEvent;
+        while (gameWindow.pollEvent(inputEvent)) {
+            if (inputEvent.type == sf::Event::Closed) {
+                gameWindow.close();
+            }
+
+            // Handle input for different states
+            if (gameState == State::MainMenu) {
+                if (inputEvent.type == sf::Event::KeyPressed && inputEvent.key.code == sf::Keyboard::Enter) {
+                    gameState = State::Gameplay;
+                    transitionTimer.restart();
+                }
+            } else if (gameState == State::Gameplay) {
+                if (inputEvent.type == sf::Event::KeyPressed && inputEvent.key.code == sf::Keyboard::Escape) {
+                    gameState = State::EndScreen;
+                } else if (inputEvent.type == sf::Event::KeyPressed && inputEvent.key.code == sf::Keyboard::P) {
+                    gameState = State::Paused;
+                }
+
+                // Player movement
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) playerAvatar.move(0, -moveSpeed);
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) playerAvatar.move(-moveSpeed, 0);
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) playerAvatar.move(0, moveSpeed);
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) playerAvatar.move(moveSpeed, 0);
+
+                // Check for mouse clicks on the player
+                if (inputEvent.type == sf::Event::MouseButtonPressed && inputEvent.mouseButton.button == sf::Mouse::Left) {
+                    sf::Vector2f mousePosition(inputEvent.mouseButton.x, inputEvent.mouseButton.y);
+                    if (playerAvatar.getGlobalBounds().contains(mousePosition)) {
+                        clickCount++;
+                        clickCounter.setString("Clicks: " + std::to_string(clickCount));
+                    }
+                }
+
+            } else if (gameState == State::Paused) {
+                if (inputEvent.type == sf::Event::KeyPressed && inputEvent.key.code == sf::Keyboard::R) {
+                    gameState = State::Gameplay;
+                }
+            } else if (gameState == State::EndScreen) {
+                if (inputEvent.type == sf::Event::KeyPressed && inputEvent.key.code == sf::Keyboard::R) {
+                    gameState = State::MainMenu;
+                    clickCount = 0;
+                    clickCounter.setString("Clicks: 0");
                 }
             }
         }
 
-        std::sort(matchedFiles.begin(), matchedFiles.end());
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
+        // Clear the screen
+        gameWindow.clear();
 
-    return matchedFiles;
-}
+        // Draw the background
+        gameWindow.draw(bgSprite);
 
-// Class definition for an animated dice
-class AnimatedDice : public sf::Drawable, public sf::Transformable {
-private:
-    std::vector<std::shared_ptr<sf::Texture>> textures;
-    sf::Sprite Thedice;
-    std::size_t currentFrame;
-    sf::Clock animationClock;
-    float frameDuration;
-    bool clicked;
-
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-        states.transform *= getTransform();
-        target.draw(Thedice, states);
-    }
-
-public:
-    AnimatedDice(float frameDuration = 0.1f)
-        : currentFrame(0), frameDuration(frameDuration), clicked(false) {}
-
-    AnimatedDice(const std::vector<std::string>& frames, float frameDuration = 0.1f)
-        : currentFrame(0), frameDuration(frameDuration), clicked(false) {
-        for (const auto& frame : frames) {
-            addFrame(frame);
-        }
-        if (!textures.empty()) {
-            Thedice.setTexture(*textures[0]);
-        }
-    }
-
-    void addFrame(const std::string& textureFile) {
-        auto texture = std::make_shared<sf::Texture>();
-        if (!texture->loadFromFile(textureFile)) {
-            throw std::runtime_error("Failed to load texture: " + textureFile);
-        }
-        textures.push_back(texture);
-    }
-
-    void handleEvent(const sf::Event& event, const sf::RenderWindow& window) {
-        if (event.type == sf::Event::MouseButtonPressed) {
-            if (Thedice.getGlobalBounds().contains(window.mapPixelToCoords(sf::Mouse::getPosition(window)))) {
-                clicked = true;
+        // Render according to the current game state
+        if (gameState == State::MainMenu) {
+            gameWindow.draw(menuText);
+        } else if (gameState == State::Gameplay) {
+            // Apply fade-in effect
+            sf::Time elapsedTime = transitionTimer.getElapsedTime();
+            if (elapsedTime.asSeconds() < 1.0f) {
+                int alpha = static_cast<int>((1.0f - elapsedTime.asSeconds()) * 255);
+                transitionOverlay.setFillColor(sf::Color(0, 0, 0, alpha));
+                gameWindow.draw(transitionOverlay);
             }
-        }
-    }
 
-    bool isClicked() const { return clicked; }
-
-    void update() {
-        if (textures.empty())
-            return;
-
-        if (animationClock.getElapsedTime().asSeconds() > frameDuration) {
-            currentFrame = (currentFrame + 1) % textures.size();
-            Thedice.setTexture(*textures[currentFrame]);
-            animationClock.restart();
-        }
-    }
-
-    void setPosition(float x, float y) { Thedice.setPosition(x, y); }
-    void setScale(float scaleX, float scaleY) { Thedice.setScale(scaleX, scaleY); }
-};
-
-// Main function
-int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Dice Background with Animated Dice");
-
-    std::string diceFolder = "./media/animations/dice_roll";
-    std::string pattern = R"(dice_\d+\.png)";  // Example pattern for dice images
-
-    std::vector<std::string> diceFiles = glob(diceFolder, pattern);
-    if (diceFiles.empty()) {
-        std::cerr << "No dice images found in the folder: " << diceFolder << std::endl;
-        return -1;
-    }
-
-    // Load textures into shared pointers
-    std::vector<std::shared_ptr<sf::Texture>> diceTextures;
-    for (const auto& file : diceFiles) {
-        auto texture = std::make_shared<sf::Texture>();
-        if (!texture->loadFromFile(file)) {
-            std::cerr << "Failed to load texture: " << file << std::endl;
-            return -1;
-        }
-        diceTextures.push_back(texture);
-    }
-
-    // Create grid for dice background
-    std::vector<sf::Sprite> diceGrid;
-    int diceSize = 100;  // Assume dice size is 100x100
-    int rows = window.getSize().y / diceSize + 1;
-    int cols = window.getSize().x / diceSize + 1;
-
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            sf::Sprite Thedice(*diceTextures[(i * cols + j) % diceTextures.size()]);
-            Thedice.setPosition(j * diceSize, i * diceSize);
-            diceGrid.push_back(Thedice);
-        }
-    }
-
-    // Create animated dice
-    AnimatedDice diceRoll(diceFiles, 0.2f);
-    diceRoll.setPosition(400, 300);
-
-    while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                window.close();
-
-            diceRoll.handleEvent(event, window);
+            gameWindow.draw(playerAvatar);
+            gameWindow.draw(clickCounter);
+        } else if (gameState == State::Paused) {
+            gameWindow.draw(playerAvatar);
+            gameWindow.draw(pauseText);
+            gameWindow.draw(clickCounter);
+        } else if (gameState == State::EndScreen) {
+            gameWindow.draw(gameOverText);
         }
 
-        if (diceRoll.isClicked()) {
-            diceRoll.update();
-        }
-
-        window.clear(sf::Color::Black);
-
-        for (const auto& Thedice : diceGrid) {
-            window.draw(Thedice);
-        }
-
-        window.draw(diceRoll);
-
-        window.display();
+        // Display everything on the screen
+        gameWindow.display();
     }
 
     return 0;
