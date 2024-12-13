@@ -1,3 +1,19 @@
+Basic OOP Terminology
+
+Fernando Gonzalez
+
+12/06/24
+
+2143 OOP
+
+Description:
+
+Provides definitions and examples of all of the OOP concepts you see below.
+
+
+
+
+
 1. Abstract Classes and Interfaces
 Abstract Classes- An abstract class serves as a blueprint for other classes. It cannot be instantiated and may contain abstract methods (methods without implementation) as well as implemented methods.
 Derived classes are required to implement the abstract methods
