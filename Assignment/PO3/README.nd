@@ -4,7 +4,12 @@ Description:
 
 The game KnuckleBones, as featured in "Cult of the Lamb", is a simple dice game that is played between two players on a 3x3 grid. The goal is to place dice on the grid and score more points than your opponent by following a few key rules. Here's a brief breakdown of the rules:
 
+ Files:
 
+|  #  |  File  |  Description  |
+| :---: | ---------------- | -------------------------------------------------- |
+|  1  |  [Link 1](msu_texas_background.jpeg)  |  Directory to image  |
+|  2  |  [Link 2](my.cpp)  |  .cpp file  |
 
 instructions:
 
